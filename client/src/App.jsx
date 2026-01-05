@@ -1,16 +1,21 @@
 import Navbar from "./components/Navbar/Navbar";
-import ExpenseForm from "./components/ExpenseForm/Expenseform";
-//import ExpenseList from "./components/ExpenseList/ExpenseList";
-import "./App.css";
+import ExpenseForm from "./components/ExpenseForm/ExpenseForm";
+import ExpenseList from "./components/ExpenseList/ExpenseList";
+import ExpenseItem from "./components/Expenseitem/Expenseitem";
+import ExpenseSummary from "./components/ExpenseSummary/ExpenseSummary";
 
-function App() {
-  return (
+import "./App.css"
+
+const App = () => {
+  return(
     <>
-      <Navbar />
-      <ExpenseForm />
-
+    <Navbar/>
+    <ExpenseForm/>
+    <ExpenseSummary/>
+    <ExpenseList/>
+    <ExpenseItem/>
     </>
-  );
+  )
 }
 
 export default App;
