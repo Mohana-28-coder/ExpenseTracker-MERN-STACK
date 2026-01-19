@@ -1,23 +1,45 @@
-import React from 'react'
-import "./ExpenseItem.css"
+import React, { useEffect, useState } from "react";
+import "./ExpenseItem.css";
 
-const ExpenseItem = () => {
+const ExpenseItem = ({ expense, onDeleteExpense, onEditExpense }) => {
+  const [date, setDate] = useState("");
+
+  useEffect(() => {
+    const DateHandler = () => {
+      const updatedDate = expense.date.split("T")[0];
+      setDate(updatedDate);
+    };
+    DateHandler();
+  }, [expense.date]); 
+
   return (
-    <>
-    <li className='expense-item'>
-        <div className='expense-left'>
-            <h3 className='expense-title'>Stationary items</h3>
-            <p className='expense-meta'>Bills 04-01-2026</p>
-        </div>
+    <li className="expense-item">
+      <div>
+        <h3>{expense.title}</h3>
+        <p className="expense-meta">
+          {expense.category} • {date} {}
+        </p>
+      </div>
 
-        <div className='expense-right'>
-            <span className='expense-amount'>₹30</span>
-            <button className='edit-btn'>Edit</button>
-            <button className='delete-btn'>Delete</button>
-        </div>
+      <div className="expense-right">
+        <span className="expense-amount">₹{expense.amount}</span>
+
+        <button
+          className="edit-btn"
+          onClick={() => onEditExpense(expense)}
+        >
+          Edit
+        </button>
+
+        <button
+          className="delete-btn"
+          onClick={() => onDeleteExpense(expense._id)}
+        >
+          Delete
+        </button>
+      </div>
     </li>
-    </>
-  )
-}
+  );
+};
 
 export default ExpenseItem;

@@ -1,24 +1,27 @@
-.expense-summary-section{
-    max-width: 1100px;
-    margin: 30px auto;
-    padding: 0 20px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
-    gap: 16px;
+.expense-summary-section {
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
 }
 
-.summary-card{
-    background-color: #FED2E2;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+.summary-card {
+  background-color:palevioletred;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
-.summary-card h3{
-    font-size: 14px;
-    margin-bottom: 8px;
+
+.summary-card h3 {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 6px;
 }
-.summary-amount{
-    font-size: 22px;
-    font-weight: 600;
-    color: #4E56C0;
+
+.summary-amount {
+  font-size: 22px;
+  font-weight: 600;
+  color: #4f46e5;
 }

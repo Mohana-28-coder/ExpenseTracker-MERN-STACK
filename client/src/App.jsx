@@ -1,21 +1,111 @@
+import React, { useEffect, useState } from "react";
 import Navbar from "./components/Navbar/Navbar";
-import ExpenseForm from "./components/ExpenseForm/ExpenseForm";
+import ExpenseForm from "./components/ExpenseForm/Expenseform";
 import ExpenseList from "./components/ExpenseList/ExpenseList";
-import ExpenseItem from "./components/Expenseitem/Expenseitem";
+import ExpenseItem from "./components/ExpenseItem/ExpenseItem";
 import ExpenseSummary from "./components/ExpenseSummary/ExpenseSummary";
-
-import "./App.css"
+import axios from "./api/axios";
+import "./App.css";
+import { CgAttachment } from "react-icons/cg";
 
 const App = () => {
-  return(
-    <>
-    <Navbar/>
-    <ExpenseForm/>
-    <ExpenseSummary/>
-    <ExpenseList/>
-    <ExpenseItem/>
-    </>
-  )
-}
+  const [expenses, setExpenses] = useState([]);
+  const [editingExpense, setEditingExpense] = useState(null);
+
+  /* Load */
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      try {
+        const response = await axios.get("/expenses");
+        setExpenses(response.data);   
+      } catch (error) {
+        console.error("Failed to fetch expenses:", error.message);
+      }
+    };
+    fetchExpenses();
+  }, []);
+
+  /* Add */
+  const addExpenseHandler = async (expense) => {
+    try {
+      const response = await axios.post("/expenses", {
+        title: expense.title,
+        amount: expense.amount,
+        category: expense.category,
+        date: expense.date,
+      });
+      setExpenses((prev) => [response.data, ...prev]); 
+    } catch (error) {
+      console.error("Add expense fields", error.message);
+    }
+  };
+
+  /* Delete */
+  const deleteExpenseHandler = async(id) =>{
+    try{
+      await axios.delete(`/expenses/${id}`);
+      setExpenses((prev) => prev.filter((expense) => expense._id !== id));
+    }
+    catch(error){
+      console.error("Delete expense failed:",error.message);
+    }
+  }
+
+  /* Start Edit */
+  const startEditHandler = (expense) => {
+    setEditingExpense(expense);
+  };
+
+  /* Update */
+  const updateExpenseHandler = async (updatedExpense) => {
+    try {
+      const response = await axios.put(
+        `/expenses/${updatedExpense._id}`, // 
+        {
+          title: updatedExpense.title,
+          amount: updatedExpense.amount,
+          category: updatedExpense.category,
+          date: updatedExpense.date,
+        }
+      );
+
+      setExpenses((prev) =>
+        prev.map((e) =>
+          e._id === response.data._id ? response.data : e
+        )
+      );
+      setEditingExpense(null);
+    } catch (error) {
+      console.error("Update expense failed", error.message);
+    }
+  };
+
+  return (
+    <div className="app">
+      <Navbar />
+
+      <main className="main-content">
+        <ExpenseForm
+          onAddExpense={addExpenseHandler}
+          onUpdateExpense={updateExpenseHandler}
+          editingExpense={editingExpense}
+        />
+
+        <ExpenseSummary expenses={expenses} />
+
+        <ExpenseList expenses={expenses}>
+          {expenses.map((expense) => (
+            <ExpenseItem
+              key={expense._id}
+              expense={expense}
+              onDeleteExpense={deleteExpenseHandler}
+              onEditExpense={startEditHandler}
+            />
+          ))}
+        </ExpenseList>
+      </main>
+    </div>
+  );
+};
 
 export default App;
