@@ -18,7 +18,11 @@ const Login = () => {
         password,
       });
 
+      // Save JWT token
+      localStorage.setItem("token", response.data.token);
+
       alert(response.data.message);
+
       navigate("/expenses");
     } catch (error) {
       alert(error.response?.data?.message || "Login failed");
@@ -34,6 +38,7 @@ const Login = () => {
         <form className="login-form" onSubmit={submitHandler}>
           <div className="form-group">
             <label>Email</label>
+
             <input
               type="email"
               placeholder="Enter your email"
@@ -45,6 +50,7 @@ const Login = () => {
 
           <div className="form-group">
             <label>Password</label>
+
             <input
               type="password"
               placeholder="Enter your password"
@@ -61,7 +67,9 @@ const Login = () => {
 
         <p className="signup-text">
           Don't have an account?{" "}
-          <span onClick={() => navigate("/signup")}>Sign up</span>
+          <span onClick={() => navigate("/signup")}>
+            Sign up
+          </span>
         </p>
       </div>
     </div>

@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // Signup
 const Signup = async (req, res) => {
@@ -17,13 +18,13 @@ const Signup = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({
+    const user = await User.create({
       name,
       email,
       password: hashedPassword,
     });
 
-    res.status(201).json({ message: "Signup Successful" });
+    res.status(201).json({ message: "Signup Successful", user });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -44,7 +45,12 @@ const Login = async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    res.status(200).json({ message: "Login Successful" });
+    // 🔑 Issue JWT with user id
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.status(200).json({ message: "Login Successful", token });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

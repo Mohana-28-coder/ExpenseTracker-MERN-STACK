@@ -1,89 +1,81 @@
-const Expense = require("../models/Expense");
+const Expense = require("../models/expenseModel");
 
-// POST 
+// POST - create new expense
 const createExpense = async (req, res) => {
   try {
     const { title, amount, category, date } = req.body;
+    const userId = req.user.id; // comes from JWT/session middleware
 
-    if (!title || !amount || !category || !date) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    
-    const expense = await Expense.create({
+    const expense = new Expense({
       title,
       amount,
       category,
       date,
+      user_id: userId,
     });
 
+    await expense.save();
     res.status(201).json(expense);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: "Error creating expense", error });
   }
 };
-//GET
-const getExpenses = async(req,res)=>{
-  try{
-    const expenses = await Expense.find().sort({date: -1});
-    res.status(200).json(expenses);
-  }
-  catch(error){
-    res.status(500).json({message:error.message});
-  }
-}
-//GET - by ID
-const getExpenseById =async(req,res) =>{
+
+// GET - get all expenses for logged-in user
+const getExpenses = async (req, res) => {
   try {
-const expense= await Expense.findById(req.params.id);
-if(!expense){
-  return res.status(404).json({message:"Expense not found"});
-}
-res.status(200).json(expense);
-} catch(error){
-  res.status(500).json({message:"Invalid expense ID"},error.message);
-}
-}
-//PUT -by ID
-const updateExpense = async(req,res) =>{
-  try{
-    const {title, amount, category, date} =  req.body;
-    const expense =await Expense.findById(req.params.id);
-    if(!expense){
-      return res.status(404).jsn({message:"Expense not found"});
-    }
-    expense.title= title || expense.title;
-    expense.amount = amount || expense.amount;
-    expense.category= category || expense.category;
-    expense.date = date || expense.date;
+    const userId = req.user.id;
+    const expenses = await Expense.find({ user_id: userId });
+    res.json(expenses);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching expenses", error });
+  }
+};
 
-    const updatedExpense = await expense.save();
-    res.status(200).json(updatedExpense);
+// GET - get expense by ID (only if it belongs to user)
+const getExpenseById = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const expense = await Expense.findOne({ _id: req.params.id, user_id: userId });
+    if (!expense) return res.status(404).json({ message: "Expense not found" });
+    res.json(expense);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching expense", error });
   }
-  catch(error){
-    res.status(500).jspn({message:"Invalid Expense ID"});
+};
 
+// PUT - update expense by ID (only if it belongs to user)
+const updateExpense = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const expense = await Expense.findOneAndUpdate(
+      { _id: req.params.id, user_id: userId },
+      req.body,
+      { new: true }
+    );
+    if (!expense) return res.status(404).json({ message: "Expense not found" });
+    res.json(expense);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating expense", error });
   }
-}
+};
 
-const deleteExpense =async(req,res) =>{
-  try{
-    const expense = await Expense.findById(req.params.id);
-    if(!expense){
-      return res.status(404).json({message:"Expense not found"});
-    }
-    await expense.deleteOne();
-    res.status(200).json({message:"Expense deleted successfully"});
+// DELETE - delete expense by ID (only if it belongs to user)
+const deleteExpense = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const expense = await Expense.findOneAndDelete({ _id: req.params.id, user_id: userId });
+    if (!expense) return res.status(404).json({ message: "Expense not found" });
+    res.json({ message: "Expense deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting expense", error });
   }
-  catch(error){
-    res.status(500).json({message:"Invalid expense ID"});
-  }
-}
+};
 
 module.exports = {
   createExpense,
   getExpenses,
   getExpenseById,
   updateExpense,
-  deleteExpense
+  deleteExpense,
 };
